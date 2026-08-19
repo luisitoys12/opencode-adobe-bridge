@@ -1,97 +1,90 @@
 # opencode-adobe-bridge
 
-> Conecta **OpenCode AI** con **Adobe After Effects** y **Adobe Premiere Pro** en Windows 10 via ExtendScript + MCP.
+> Plugin CEP para **Adobe After Effects** y **Adobe Premiere Pro** que abre un chat de **OpenCode AI** directamente dentro de Adobe — sin salir de la app.
+
+![Panel preview: chat OpenCode dentro de Adobe](https://via.placeholder.com/700x200/1a1a1c/4f98a3?text=OpenCode+AI+Panel+inside+Adobe)
 
 ---
 
 ## ¿Cómo funciona?
 
 ```
-OpenCode (Claude/AI)
-      │
-      ▼
-MCP Server (tools: ae_create_comp, ae_render, ppro_export...)
-      │
-      ▼
-Express HTTP :3333
-      │
-      ├──► afterfx.exe -r script.jsx  (After Effects)
-      └──► premiere.exe -r script.jsx (Premiere Pro)
+┌─────────────────────────────────┐
+│  Adobe (AE / Premiere Pro)      │
+│  ┌───────────────────────────┐  │
+│  │  CEP Panel (HTML/CSS/JS)  │  │  ← Chat UI dentro de Adobe
+│  │  OpenCode AI Chat         │  │
+│  └────────────┬──────────────┘  │
+└───────────────│─────────────────┘
+                │ HTTP fetch
+                ▼
+        Bridge local :3333
+         (Express + Node)
+                │
+                ├──► afterfx.exe -r script.jsx
+                └──► premiere.exe -r script.jsx
 ```
 
-1. **MCP Server** — OpenCode se conecta como herramienta MCP vía stdio
-2. **Bridge HTTP** — Express en `localhost:3333` traduce llamadas a scripts
-3. **ExtendScript `.jsx`** — Adobe ejecuta los scripts contra la app abierta
+1. **CEP Panel** — Interfaz HTML embebida dentro de Adobe. Se abre desde `Window > Extensions > OpenCode AI`
+2. **Bridge HTTP** — Servidor Node que recibe comandos del panel y ejecuta scripts
+3. **ExtendScript `.jsx`** — Controla la app Adobe desde adentro
 
 ---
 
-## Requisitos
-
-- Windows 10 (64-bit)
-- Node.js 18+
-- Adobe After Effects 2024/2025 **abierto**
-- Adobe Premiere Pro 2024/2025 **abierto**
-- [OpenCode](https://opencode.ai) instalado
-
----
-
-## Instalación
+## Instalación rápida (Windows 10/11)
 
 ```bat
 git clone https://github.com/luisitoys12/opencode-adobe-bridge
 cd opencode-adobe-bridge
 npm install
+install.bat
 ```
 
-Edita `config/paths.json` con las rutas exactas a tus ejecutables de Adobe.
+`install.bat` copia el panel a `%APPDATA%\Adobe\CEP\extensions\` y habilita el modo debug para extensiones sin firma.
 
 ---
 
 ## Uso
 
-**Terminal 1 — Iniciar el bridge:**
+**Terminal — iniciar bridge:**
 ```bat
-npm run bridge
+start-bridge.bat
 ```
 
-**Terminal 2 — Iniciar OpenCode (detecta `.opencode.json` automáticamente):**
+**En Adobe:**
+> `Window > Extensions > OpenCode AI`
+
+El panel aparece como cualquier panel nativo de Adobe (acoplable, redimensionable).
+
+---
+
+## Comandos del chat
+
+| Comando | App | Descripción |
+|---|---|---|
+| `/comps` | After Effects | Lista composiciones abiertas |
+| `/nueva Intro 1920 1080 10` | AE | Crea composición |
+| `/render Intro C:\Videos\out.avi` | AE | Renderiza composición |
+| `/seqs` | Premiere Pro | Lista secuencias |
+| `/export Final C:\Videos\out.mp4` | PPro | Exporta secuencia |
+| `/jsx alert('hola')` | Ambas | Ejecuta ExtendScript |
+
+---
+
+## También compatible con OpenCode MCP
+
+El archivo `.opencode.json` configura el MCP server para que puedas controlar Adobe también desde el terminal de OpenCode:
+
 ```bat
 opencode
 ```
 
-Ya puedes pedirle a OpenCode cosas como:
-- *"Crea una composición 1920x1080 llamada Intro en After Effects"*
-- *"Renderiza la comp 'Intro' a C:\Videos\intro.avi"*
-- *"Lista las secuencias abiertas en Premiere"*
-- *"Exporta la secuencia 'Final Cut' a C:\Videos\final.mp4"*
-
 ---
 
-## Herramientas MCP disponibles
+## Versiones Adobe soportadas
 
-| Herramienta | App | Descripción |
-|---|---|---|
-| `ae_list_comps` | After Effects | Lista composiciones abiertas |
-| `ae_create_comp` | After Effects | Crea nueva composición |
-| `ae_render` | After Effects | Agrega comp a la cola de render |
-| `ae_run_script` | After Effects | Ejecuta JSX personalizado |
-| `ppro_list_sequences` | Premiere Pro | Lista secuencias del proyecto |
-| `ppro_export_sequence` | Premiere Pro | Exporta secuencia via AME |
-| `ppro_run_script` | Premiere Pro | Ejecuta JSX personalizado |
-
----
-
-## Configuración de rutas (`config/paths.json`)
-
-Ajusta según tu versión de Adobe:
-
-```json
-{
-  "afterEffects": "C:\\Program Files\\Adobe\\Adobe After Effects 2025\\Support Files\\afterfx.exe",
-  "premierePro": "C:\\Program Files\\Adobe\\Adobe Premiere Pro 2025\\Adobe Premiere Pro.exe",
-  "tempDir": "C:\\Users\\%USERNAME%\\AppData\\Local\\Temp\\opencode-adobe-bridge"
-}
-```
+- After Effects 2022–2025 (v22+)
+- Premiere Pro 2022–2025 (v22+)
 
 ---
 
