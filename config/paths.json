@@ -1,0 +1,9 @@
+{
+  "afterEffects": "C:\\Program Files\\Adobe\\Adobe After Effects 2025\\Support Files\\afterfx.exe",
+  "afterEffects2024": "C:\\Program Files\\Adobe\\Adobe After Effects 2024\\Support Files\\afterfx.exe",
+  "premierePro": "C:\\Program Files\\Adobe\\Adobe Premiere Pro 2025\\Adobe Premiere Pro.exe",
+  "premierePro2024": "C:\\Program Files\\Adobe\\Adobe Premiere Pro 2024\\Adobe Premiere Pro.exe",
+  "tempDir": "C:\\Users\\%USERNAME%\\AppData\\Local\\Temp\\opencode-adobe-bridge",
+  "preferredAEVersion": "2025",
+  "preferredPProVersion": "2025"
+}

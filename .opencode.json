@@ -1,0 +1,12 @@
+{
+  "$schema": "https://opencode.ai/config.schema.json",
+  "mcpServers": {
+    "adobe-bridge": {
+      "command": "node",
+      "args": ["mcp-server/index.js"],
+      "env": {
+        "BRIDGE_PORT": "3333"
+      }
+    }
+  }
+}
